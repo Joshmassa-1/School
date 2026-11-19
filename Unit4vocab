@@ -1,0 +1,2201 @@
+Put your HTML text here<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APWH Mastery Engine</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #131c31;
+      --surface-2: #1c2842;
+      --border: #2a3958;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-dim: rgba(56, 189, 248, 0.14);
+      --purple: #a78bfa;
+      --purple-dim: rgba(167, 139, 250, 0.15);
+      --good: #22c55e;
+      --good-dim: rgba(34, 197, 94, 0.15);
+      --bad: #ef4444;
+      --bad-dim: rgba(239, 68, 68, 0.15);
+      --warn: #f59e0b;
+      --warn-dim: rgba(245, 158, 11, 0.15);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 14px 48px;
+      line-height: 1.5;
+    }
+
+    .app { width: 100%; max-width: 960px; }
+
+    /* Top Bar */
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand h1 { font-size: 1.12rem; font-weight: 700; letter-spacing: -0.02em; }
+
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: background 0.12s, border-color 0.12s, transform 0.06s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover { background: var(--surface-2); border-color: #475569; }
+    button:active { transform: translateY(1px); }
+
+    button.primary {
+      background: var(--accent);
+      color: #082f49;
+      border-color: var(--accent);
+    }
+    button.primary:hover { background: #7dd3fc; }
+
+    button.active-toggle {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button.danger { color: #fca5a5; border-color: rgba(239, 68, 68, 0.35); }
+    button.danger:hover { background: var(--bad-dim); border-color: var(--bad); }
+
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.7rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(11, 17, 32, 0.7);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* HUD */
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hud-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 13px;
+    }
+
+    .hud-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .hud-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hud-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    /* Quiz Card */
+    .quiz-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .q-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .q-tags { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+
+    .pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+    }
+    .pill.warn { background: var(--warn-dim); color: #fcd34d; border-color: rgba(245, 158, 11, 0.35); }
+    .pill.bad { background: var(--bad-dim); color: #fca5a5; border-color: rgba(239, 68, 68, 0.35); }
+    .pill.good { background: var(--good-dim); color: #86efac; border-color: rgba(34, 197, 94, 0.35); }
+    .pill.purple { background: var(--purple-dim); color: #ddd6fe; border-color: rgba(167, 139, 250, 0.4); }
+    .pill.accent { background: var(--accent-dim); color: #bae6fd; border-color: rgba(56, 189, 248, 0.35); }
+
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.86rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer { font-weight: 700; color: var(--accent); }
+    .timer.slow { color: var(--warn); }
+    .timer-base { font-size: 0.74rem; color: var(--muted); }
+
+    .prompt-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .prompt-text {
+      font-size: 1.24rem;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 20px;
+      color: #f8fafc;
+    }
+
+    /* Options MC */
+    .options-wrap { position: relative; }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+      transition: filter 0.18s ease, opacity 0.18s ease;
+    }
+    .options.def-mode { grid-template-columns: 1fr; }
+    .options.blurred { filter: blur(8px); user-select: none; opacity: 0.55; }
+
+    .blur-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      border-radius: 10px;
+      background: rgba(11, 17, 32, 0.25);
+    }
+
+    .blur-chip {
+      background: var(--surface-2);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .option-btn {
+      text-align: left;
+      padding: 14px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      line-height: 1.4;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .option-btn:disabled { cursor: default; }
+
+    .opt-key {
+      flex-shrink: 0;
+      width: 25px;
+      height: 25px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .option-btn.correct { border-color: var(--good); background: var(--good-dim); color: #dcfce7; }
+    .option-btn.correct .opt-key { background: var(--good); border-color: var(--good); color: #052e16; }
+    .option-btn.wrong { border-color: var(--bad); background: var(--bad-dim); color: #fee2e2; }
+    .option-btn.wrong .opt-key { background: var(--bad); border-color: var(--bad); color: #450a0a; }
+    .option-btn.dimmed { opacity: 0.44; }
+
+    /* Blind Recall UI */
+    .recall-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .recall-answer {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--good);
+      margin-bottom: 6px;
+    }
+
+    .recall-hook {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .recall-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .grade-btn-good { border-color: rgba(34, 197, 94, 0.5); background: rgba(34, 197, 94, 0.12); color: #bbf7d0; }
+    .grade-btn-good:hover { background: rgba(34, 197, 94, 0.24); }
+    .grade-btn-hard { border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.12); color: #fde68a; }
+    .grade-btn-hard:hover { background: rgba(245, 158, 11, 0.24); }
+    .grade-btn-bad { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.12); color: #fecaca; }
+    .grade-btn-bad:hover { background: rgba(239, 68, 68, 0.24); }
+
+    /* Type-In UI */
+    .type-box { display: flex; flex-direction: column; gap: 10px; }
+    .type-row { display: flex; gap: 8px; }
+
+    .type-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .type-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18); }
+    .type-input.ok { border-color: var(--good); background: var(--good-dim); }
+    .type-input.err { border-color: var(--bad); background: var(--bad-dim); }
+
+    .hint-line {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.88rem;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+    }
+
+    /* Feedback + Contrast Card */
+    .feedback-bar {
+      margin-top: 16px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .feedback-bar.is-correct { border-color: rgba(34, 197, 94, 0.45); background: rgba(34, 197, 94, 0.08); }
+    .feedback-bar.is-wrong { border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.08); }
+
+    .fb-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .feedback-msg { font-size: 0.94rem; font-weight: 700; }
+    .feedback-hook { font-size: 0.84rem; color: #cbd5e1; margin-top: 4px; }
+
+    .contrast-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .contrast-card {
+      background: rgba(11, 17, 32, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 0.82rem;
+    }
+    .contrast-card.right { border-color: rgba(34, 197, 94, 0.4); }
+    .contrast-card.picked { border-color: rgba(239, 68, 68, 0.4); }
+    .contrast-title { font-weight: 700; margin-bottom: 2px; }
+
+    .shortcuts-hint {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    /* Report View */
+    .hidden { display: none !important; }
+
+    .report-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    .report-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .report-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .confused-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+    .confused-panel h3 { font-size: 0.85rem; color: #fca5a5; margin-bottom: 8px; }
+    .confused-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .confused-chip {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--bad-dim);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fecaca;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left; }
+    th, td { padding: 10px 11px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    th {
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover { color: var(--text); }
+    tr.term-row { cursor: pointer; }
+    tr.term-row:hover td { background: rgba(255, 255, 255, 0.03); }
+    tr.detail-row td {
+      white-space: normal;
+      background: rgba(19, 28, 49, 0.75);
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+    }
+    td.term-col { white-space: normal; min-width: 170px; font-weight: 600; }
+    .def-preview { display: block; font-size: 0.74rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    .num { font-variant-numeric: tabular-nums; }
+    .angle-list { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+
+    @media (max-width: 680px) {
+      .hud { grid-template-columns: repeat(2, 1fr); }
+      .options { grid-template-columns: 1fr; }
+      .contrast-grid { grid-template-columns: 1fr; }
+      .prompt-text { font-size: 1.08rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>APWH Mastery Engine</h1>
+        <span class="badge">29 Terms</span>
+      </div>
+      <div class="controls">
+        <button id="formatBtn" title="Switch study format (V)">Format: Smart Mix <span class="kbd">V</span></button>
+        <button id="dirBtn" title="Switch question direction (M)">Def → Term <span class="kbd">M</span></button>
+        <button id="blurBtn" title="Blur MC options briefly to force recall first (B)">Blur: Off <span class="kbd">B</span></button>
+        <button id="speedBtn" title="Cycle advance speed (F)">Speed: Fast <span class="kbd">F</span></button>
+        <button id="focusBtn" title="Drill only weak, confused, or unseen terms">All Terms</button>
+        <button id="reportBtn" class="primary" title="Detailed performance report (R)">Report <span class="kbd">R</span></button>
+      </div>
+    </header>
+
+    <section class="hud">
+      <div class="hud-card">
+        <div class="hud-label">Session Accuracy</div>
+        <div class="hud-value" id="hudAcc">—</div>
+        <div class="hud-sub" id="hudAttempts">0 answered</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">Your Pace (Median)</div>
+        <div class="hud-value" id="hudBaseline">—</div>
+        <div class="hud-sub" id="hudLastPace">Relative 1.00x baseline</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">Due / Re-Queue</div>
+        <div class="hud-value" id="hudRequeue">0</div>
+        <div class="hud-sub" id="hudStreak">Streak: 0</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">True Mastery</div>
+        <div class="hud-value" id="hudMastered">0 / 29</div>
+        <div class="hud-sub" id="hudWeak">0 needing work</div>
+      </div>
+    </section>
+
+    <!-- QUIZ VIEW -->
+    <main id="quizView" class="quiz-card">
+      <div class="q-meta">
+        <div class="q-tags" id="qTags"></div>
+        <div class="timer-wrap">
+          <span class="timer-base" id="timerBaseline">1.0x = —</span>
+          <span class="timer" id="qTimer">0.0s</span>
+        </div>
+      </div>
+
+      <div class="prompt-label" id="promptLabel">Prompt</div>
+      <div class="prompt-text" id="promptText">Loading...</div>
+
+      <!-- Multiple Choice Container -->
+      <div id="mcArea" class="options-wrap">
+        <div id="blurOverlay" class="blur-overlay hidden">
+          <span class="blur-chip">Recall it first — press <span class="kbd">Space</span> or click to reveal choices</span>
+        </div>
+        <div class="options" id="optionsGrid"></div>
+      </div>
+
+      <!-- Blind Recall Container -->
+      <div id="recallArea" class="recall-box hidden">
+        <div id="recallHiddenState">
+          <p style="color: var(--muted); font-size: 0.92rem; margin-bottom: 12px;">
+            Say or picture the exact APWH term &amp; significance in your head before revealing.
+          </p>
+          <button id="revealRecallBtn" class="primary">Reveal Answer <span class="kbd">Space</span></button>
+        </div>
+        <div id="recallShownState" class="hidden">
+          <div class="recall-answer" id="recallAnswerText"></div>
+          <div class="recall-hook" id="recallHookText"></div>
+          <div class="recall-actions">
+            <button class="grade-btn-good" data-grade="good">Nailed It <span class="kbd">1</span></button>
+            <button class="grade-btn-hard" data-grade="hard">Hesitated / Shaky <span class="kbd">2</span></button>
+            <button class="grade-btn-bad" data-grade="bad">Missed It <span class="kbd">3</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type-In Container -->
+      <div id="typeArea" class="type-box hidden">
+        <div class="type-row">
+          <input id="typeInput" class="type-input" type="text" placeholder="Type the APWH term (Enter to submit, ? for letter hint)..." autocomplete="off" spellcheck="false" />
+          <button id="typeHintBtn" type="button">Hint <span class="kbd">?</span></button>
+          <button id="typeSubmitBtn" type="button" class="primary">Check <span class="kbd">Enter</span></button>
+        </div>
+        <div id="typeHintText" class="hint-line hidden"></div>
+      </div>
+
+      <!-- Feedback Bar -->
+      <div class="feedback-bar" id="feedbackBar">
+        <div class="fb-top">
+          <div>
+            <div class="feedback-msg" id="feedbackMsg">Use keys 1–4 or click an option</div>
+            <div class="feedback-hook" id="feedbackHook">Wrong answers carry heavy priority + 3-question comeback spacing; relative slowness nudges frequency gently.</div>
+          </div>
+          <button id="nextBtn" class="hidden primary">Next <span class="kbd">Space</span></button>
+        </div>
+        <div id="contrastBox" class="contrast-grid hidden"></div>
+      </div>
+
+      <div class="shortcuts-hint">
+        <span class="kbd">1</span>–<span class="kbd">4</span> / <span class="kbd">A</span>–<span class="kbd">D</span> pick &nbsp;•&nbsp;
+        <span class="kbd">Space</span> / <span class="kbd">Enter</span> reveal or next &nbsp;•&nbsp;
+        <span class="kbd">V</span> format &nbsp;•&nbsp;
+        <span class="kbd">M</span> direction &nbsp;•&nbsp;
+        <span class="kbd">B</span> blur &nbsp;•&nbsp;
+        <span class="kbd">F</span> speed &nbsp;•&nbsp;
+        <span class="kbd">R</span> report
+      </div>
+    </main>
+
+    <!-- REPORT VIEW -->
+    <section id="reportView" class="report-panel hidden">
+      <div class="report-header">
+        <div>
+          <h2>Mastery &amp; Confusion Report</h2>
+          <p style="font-size: 0.84rem; color: var(--muted); margin-top: 2px;">
+            Click any row to inspect all 4 APWH test angles &amp; memory hook. Relative speed compares each term to your own median pace.
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="backToQuizBtn" class="primary">Back to Quiz <span class="kbd">R</span></button>
+          <button id="exportCsvBtn">Export CSV</button>
+          <button id="resetStatsBtn" class="danger">Reset Stats</button>
+        </div>
+      </div>
+
+      <div class="report-summary" id="reportSummary"></div>
+
+      <div id="confusedPanel" class="confused-panel hidden">
+        <h3>Most Frequently Confused Pairs (auto-injected into your MC choices)</h3>
+        <div class="confused-chips" id="confusedChips"></div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-group" id="filterGroup">
+          <button data-filter="all" class="active-toggle">All (29)</button>
+          <button data-filter="missed">Missed / Debt</button>
+          <button data-filter="slow">Relatively Slow (&gt;1.3x)</button>
+          <button data-filter="unseen">Unseen</button>
+          <button data-filter="mastered">Mastered</button>
+        </div>
+        <button id="practiceWeakBtn">Drill Missed, Slow &amp; Unseen</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="term">Term (click row to expand)</th>
+              <th data-sort="attempts">Tried</th>
+              <th data-sort="wrong">Wrong</th>
+              <th data-sort="correct">Right</th>
+              <th data-sort="accuracy">Accuracy</th>
+              <th data-sort="avgTime">Avg Time</th>
+              <th data-sort="relSpeed">Rel Pace</th>
+              <th data-sort="weight">Priority</th>
+              <th data-sort="status">Stage</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const TERMS = [
+      {
+        id: "encomienda",
+        term: "Encomienda",
+        aliases: ["encomienda", "encomiendas"],
+        short: "Spanish colonial forced-labor and tribute grant over Indigenous Americans.",
+        hook: "Think 'in command' (encomendar = to entrust): Spanish conquistadors were entrusted with mainland Indigenous labor.",
+        confusables: ["engenhos", "peninsular", "cortes", "pizarro", "mirs", "tordesillas", "mestizos"],
+        prompts: [
+          "A Spanish colonial labor institution granting conquistadors the right to extract forced work and tribute from Indigenous villages in exchange for supposed protection and Christianization.",
+          "Operating like a New World feudal grant, this coerced labor system bound native communities to Spanish landlords before declining due to native demographic collapse and crown reforms.",
+          "Fiercely condemned by friar Bartolomé de las Casas for its brutal exploitation, this legal arrangement allowed settlers to compel mining and farming labor from conquered Americans.",
+          "Unlike Portuguese Brazilian sugar estates relying on enslaved Africans, this early Spanish mainland grant exploited conquered Indigenous peoples under royal tribute obligations."
+        ]
+      },
+      {
+        id: "dahomey",
+        term: "Dahomey",
+        aliases: ["dahomey", "kingdom of dahomey"],
+        short: "West African kingdom (modern Benin) that grew rich trading captives for European guns.",
+        hook: "Dahomey = West African gun-slave cycle kingdom (Benin); also the homeland of Vodun.",
+        confusables: ["vodun", "nzinga", "maroon_wars", "engenhos", "maratha", "gloucester"],
+        prompts: [
+          "A centralized West African kingdom (in modern-day Benin) that expanded militarily during the 17th–19th centuries by trading war captives for European firearms.",
+          "Demonstrating the 'gun-slave cycle,' this coastal-hinterland African state used imported European muskets to raid neighbors and monopolize regional human trafficking.",
+          "Ruled by a powerful royal court famously guarded by an all-female military regiment, this West African polity reshaped Atlantic trade on its own terms rather than collapsing to Europeans.",
+          "Unlike Central African rulers who fought for decades to block Portuguese slaving raids, this West African kingdom centralized power by actively participating in and taxing the slave trade."
+        ]
+      },
+      {
+        id: "vodun",
+        term: "Vodun",
+        aliases: ["vodun", "vodou", "voodoo"],
+        short: "West African spiritual tradition that syncretized with Catholicism in the Americas.",
+        hook: "Vodun originated in West Africa (Dahomey/Benin) and blended with Catholic saints in Haiti (Vodou).",
+        confusables: ["dahomey", "maroon_wars", "ulama", "pueblo_revolt", "nzinga", "mullatoes"],
+        prompts: [
+          "A West African spiritual tradition centered around ancestral spirits and deities that syncretized with Roman Catholicism in Caribbean colonies like Saint-Domingue (Haiti).",
+          "Carried across the Middle Passage by enslaved Fon and Ewe peoples, this belief system disguised African spirits behind Catholic saints to survive colonial bans.",
+          "Serving as a cultural anchor for enslaved Africans—and later inspiring solidarity during the Haitian Revolution—this syncretic faith blended African cosmology with Christian ritual.",
+          "Unlike orthodox Sunni legalism enforced in Eurasian land empires, this spiritual tradition thrived through religious syncretism across the African diaspora in the Americas."
+        ]
+      },
+      {
+        id: "glorious_revolution",
+        term: "Glorious Revolution",
+        aliases: ["glorious revolution", "revolution of 1688"],
+        short: "1688 bloodless English overthrow of James II establishing parliamentary supremacy.",
+        hook: "1688 England: Protestant William & Mary replace Catholic James II -> English Bill of Rights & Parliament wins.",
+        confusables: ["primogeniture", "mercantilism", "pugachev", "montreal", "metacoms_war", "pueblo_revolt"],
+        prompts: [
+          "The 1688 bloodless overthrow of Catholic King James II of England by William and Mary, cementing constitutional monarchy and parliamentary supremacy.",
+          "Resulting directly in the 1689 English Bill of Rights, this political transition permanently limited royal absolutism and guaranteed Protestant succession in Britain.",
+          "Influenced by John Locke's ideas of consent of the governed, this late-17th-century power shift gave Parliament control over taxation, lawmaking, and standing armies.",
+          "Unlike violent peasant uprisings against Russian autocracy or colonial frontier wars, this 1688 European political upheaval transferred crown power peacefully via parliamentary invitation."
+        ]
+      },
+      {
+        id: "ulama",
+        term: "Ulama",
+        aliases: ["ulama", "ulema"],
+        short: "Islamic religious scholars and jurists who interpreted Sharia law in Muslim empires.",
+        hook: "Ulama = 'learned ones' in Islam — Sharia scholars who advised or checked Ottoman & Mughal sultans.",
+        confusables: ["maratha", "sepoys", "vodun", "mirs", "peninsular", "creoles"],
+        prompts: [
+          "Sunni Islamic religious scholars and legal experts who interpreted Sharia law, oversaw madrasas and courts, and advised rulers in empires like the Ottomans and Mughals.",
+          "Acting as guardians of Islamic orthodoxy, this educated clerical-legal elite could legitimize sultans' decrees or oppose policies deemed un-Islamic, such as Akbar's syncretism.",
+          "Staffing religious courts and charitable endowments (waqfs), these scholars served as the intellectual and judicial backbone linking imperial rulers to Muslim subjects.",
+          "Unlike European colonial administrators appointed by ancestry or Hindu warrior elites resisting Mughal taxation, this class derived authority from mastery of Islamic scripture and jurisprudence."
+        ]
+      },
+      {
+        id: "peninsular",
+        term: "Peninsular (Peninsulares)",
+        aliases: ["peninsular", "peninsulares"],
+        short: "Spanish-born elites in the Americas at the very top of the colonial casta hierarchy.",
+        hook: "Born on the Iberian PENINSULA (Spain) -> highest tier of the colonial casta system.",
+        confusables: ["creoles", "mestizos", "mullatoes", "encomienda", "ulama", "cortes"],
+        prompts: [
+          "European-born elites from Spain living in the Americas who sat at the top of the colonial casta hierarchy and monopolized the highest government, military, and church offices.",
+          "Sent directly from Madrid to govern viceroyalties and audiencias, this privileged upper caste often clashed with American-born elites who resented being shut out of top posts.",
+          "Occupying the apex of colonial Latin American social stratification solely due to birthplace on the Iberian mainland, this small group guarded royal authority.",
+          "Unlike American-born elites of pure European blood, this top-ranking colonial group was born in Europe and enjoyed exclusive access to viceroyalties and bishoprics."
+        ]
+      },
+      {
+        id: "mullatoes",
+        term: "Mullatoes (Mulattoes)",
+        aliases: ["mullatoes", "mulattoes", "mulatoes", "mulatto", "mullato"],
+        short: "People of mixed European and African ancestry in the colonial casta system.",
+        hook: "Castas: Peninsulares (Spain) -> Creoles (Euro born in Americas) -> Mestizos (Euro+Native) -> Mulattoes (Euro+African).",
+        confusables: ["mestizos", "creoles", "peninsular", "maroon_wars", "engenhos", "gloucester"],
+        prompts: [
+          "People of mixed European and African ancestry within the Spanish and Portuguese colonial casta social hierarchy in the Americas.",
+          "Particularly numerous in plantation societies like Brazil and the Caribbean, this mixed-heritage casta category often worked as artisans, overseers, or free urban laborers.",
+          "Positioned below American-born whites in Iberian racial classifications, this demographic group reflected centuries of colonial contact between European settlers and African populations.",
+          "Unlike people of mixed European and Indigenous American descent, this casta classification specifically denoted mixed European and African heritage."
+        ]
+      },
+      {
+        id: "primogeniture",
+        term: "Primogeniture Laws",
+        aliases: ["primogeniture laws", "primogeniture"],
+        short: "Inheritance rule giving all family land to the eldest son, pushing younger sons overseas.",
+        hook: "Primo (first) + geniture (birth) = eldest son takes the estate; younger sons sailed for wealth.",
+        confusables: ["mercantilism", "mirs", "encomienda", "glorious_revolution", "tordesillas", "peninsular"],
+        prompts: [
+          "European inheritance statutes stipulating that the eldest son receives the entire family estate, pushing landless younger sons to seek wealth and status overseas.",
+          "Designed to keep noble estates intact rather than splitting them among heirs, this legal tradition spurred younger aristocratic brothers to invest in colonial voyages and joint-stock ventures.",
+          "Common in early modern England and parts of Western Europe, this property-transfer rule helped supply ambitious soldiers, merchants, and colonists for overseas expansion.",
+          "Unlike Russian village communes that periodically redivided farmland among families, this European inheritance custom concentrated all ancestral property in a single firstborn male heir."
+        ]
+      },
+      {
+        id: "caravel",
+        term: "Caravel",
+        aliases: ["caravel", "caravels"],
+        short: "Small, fast 15th-century Portuguese/Spanish exploration ship with triangular lateen sails.",
+        hook: "Caravel = compact exploration ship (lateen sails); Galleons = giant armed silver/cargo ships.",
+        confusables: ["galleons", "magellan", "tordesillas", "columbian_exchange", "mercantilism", "primogeniture"],
+        prompts: [
+          "A small, fast, highly maneuverable Portuguese and Spanish sailing vessel with triangular lateen sails that enabled oceanic exploration along Africa and across the Atlantic.",
+          "Combining square sails for open-ocean speed with lateen sails for tacking into headwinds, this 15th-century Iberian ship allowed explorers to return home against prevailing winds.",
+          "Sponsored by Prince Henry the Navigator, early Iberian coastal expeditions relied on this agile, shallow-draft vessel to chart unknown reefs and river mouths.",
+          "Unlike massive, heavily gunned multi-decked bullion haulers built later for Manila trade, this nimble 15th-century exploration craft sacrificed cargo space for windward agility."
+        ]
+      },
+      {
+        id: "metacoms_war",
+        term: "Metacom's War (also known as King Philip's War)",
+        aliases: ["metacoms war", "metacom's war", "king philips war", "king philip's war", "metacom"],
+        short: "1675–1676 New England war where Indigenous nations led by a Wampanoag chief fought English settlers.",
+        hook: "1675 New England: Wampanoag sachem Metacom ('King Philip') vs English colonists — Natives defeated.",
+        confusables: ["pueblo_revolt", "montreal", "maroon_wars", "gloucester", "pugachev", "maratha"],
+        prompts: [
+          "A devastating 1675–1676 conflict in New England where a coalition of Indigenous tribes fought desperately to halt encroaching English settlers.",
+          "Proportionally the deadliest war in early North American colonial history, this 1670s struggle ravaged dozens of Puritan towns before militias crushed Native resistance.",
+          "Sparked by English land seizures, livestock damage, and the execution of Wampanoag men, this uprising ended major Indigenous military power in southern New England.",
+          "Unlike the 1680 Southwestern uprising that expelled Spanish rule for twelve years, this 1675 New England coalition war ended with Indigenous defeat and enslavement."
+        ]
+      },
+      {
+        id: "pizarro",
+        term: "Francisco Pizarro",
+        aliases: ["francisco pizarro", "pizarro"],
+        short: "Spanish conquistador who conquered the Inca Empire in the 1530s.",
+        hook: "Pizarro = Peru / Inca (Atahualpa). Cortes = Mexico / Aztec (Moctezuma).",
+        confusables: ["cortes", "magellan", "encomienda", "tordesillas", "galleons", "peninsular"],
+        prompts: [
+          "The Spanish conquistador who led the 1530s expedition that toppled the Inca Empire in the Andes after capturing and executing Emperor Atahualpa.",
+          "Exploiting an Inca civil war and devastating smallpox outbreaks, this adventurer seized Cuzco and opened massive Andean silver wealth to Spain.",
+          "After demanding a room filled with gold and silver as ransom for the captured Sapa Inca, this Spanish commander still had the ruler executed and claimed Peru for Charles V.",
+          "Unlike the conquistador who marched on Tenochtitlan in central Mexico in 1519, this Spanish leader targeted the South American Andean empire a decade later."
+        ]
+      },
+      {
+        id: "tordesillas",
+        term: "Treaty of Tordesillas",
+        aliases: ["treaty of tordesillas", "tordesillas"],
+        short: "1494 papal-brokered line dividing non-European lands between Spain (west) and Portugal (east).",
+        hook: "1494 line: Spain gets the Americas (west), Portugal gets Brazil + Africa/Indian Ocean route (east).",
+        confusables: ["montreal", "mercantilism", "magellan", "encomienda", "caravel", "galleons"],
+        prompts: [
+          "A 1494 papal-brokered agreement that drew a north-south meridian line dividing newly claimed non-European lands between Spain (west) and Portugal (east).",
+          "Intended to prevent war between rival Catholic maritime powers after 1492, this diplomatic settlement unintentionally granted Portugal eastern South America (Brazil).",
+          "Ignoring the sovereignty of Indigenous empires and rival Protestant nations, this 1494 accord split the globe's oceanic trade spheres between two Iberian crowns.",
+          "Unlike the 1701 North American peace negotiated between French colonists and 39 Native nations, this 1494 European agreement excluded Indigenous peoples entirely."
+        ]
+      },
+      {
+        id: "montreal",
+        term: "Great Peace of Montreal",
+        aliases: ["great peace of montreal", "peace of montreal", "montreal"],
+        short: "1701 treaty between New France and 39 Indigenous nations ending Beaver Wars conflict.",
+        hook: "1701 New France: French colonists + 39 Native nations (incl. Haudenosaunee) sign fur-trade peace.",
+        confusables: ["tordesillas", "metacoms_war", "pueblo_revolt", "glorious_revolution", "mercantilism", "maroon_wars"],
+        prompts: [
+          "A landmark 1701 diplomatic settlement between New France and 39 Indigenous nations (including the Haudenosaunee Confederacy) that ended decades of Beaver Wars conflict.",
+          "Ratified by roughly 1,300 Native delegates and French colonial officials, this treaty stabilized Great Lakes fur-trade networks and made France an arbiter of regional disputes.",
+          "Representing New France's reliance on Indigenous alliances rather than mass settler displacement, this 1701 pact secured Haudenosaunee neutrality between French and British rivals.",
+          "Unlike the 1494 papal agreement dividing overseas empires without Native consent, this 1701 North American accord rested on Indigenous diplomatic protocols and gift exchange."
+        ]
+      },
+      {
+        id: "galleons",
+        term: "Galleons",
+        aliases: ["galleons", "galleon", "manila galleons"],
+        short: "Huge, heavily armed Spanish cargo ships moving silver & luxury goods across Atlantic/Pacific.",
+        hook: "Galleons = Giant floating fortresses/cargo ships (think Manila Galleons carrying American silver to Asia).",
+        confusables: ["caravel", "mercantilism", "tordesillas", "magellan", "engenhos", "columbian_exchange"],
+        prompts: [
+          "Large, heavily armed multi-decked Spanish sailing vessels engineered to carry massive cargoes of American silver and Asian luxury goods across oceans.",
+          "Sailing annual transpacific routes between Acapulco and the Philippines, these giant cargo ships forged the first direct, sustained global trade link between the Americas and Asia.",
+          "Protected by dozens of cannons and organized into armed treasure convoys, these ships delivered Potosí and Mexican bullion to fund Habsburg Spain and buy Chinese silk and porcelain.",
+          "Unlike nimble 15th-century exploratory vessels designed for shallow coastal mapping, these towering 16th–18th century ships prioritized heavy firepower and massive cargo holds."
+        ]
+      },
+      {
+        id: "mercantilism",
+        term: "Mercantilism",
+        aliases: ["mercantilism", "mercantilist"],
+        short: "European economic policy maximizing state bullion via colonies, tariffs, and trade surplus.",
+        hook: "Mercantilism = zero-sum bullion hoarding: export more than you import, colonies exist solely for the mother country.",
+        confusables: ["primogeniture", "galleons", "columbian_exchange", "tordesillas", "encomienda", "engenhos"],
+        prompts: [
+          "An early modern European economic theory holding that national power depended on accumulating gold and silver bullion through a favorable balance of trade and colonial monopolies.",
+          "Viewing global wealth as a fixed pie, states practicing this policy slapped high tariffs on foreign rivals, chartered monopoly companies, and barred colonies from trading freely.",
+          "Under this state-directed commercial system, overseas colonies functioned strictly to supply cheap raw materials and buy finished manufactured goods from the mother country.",
+          "Unlike modern free-trade capitalism or spontaneous biological exchanges across oceans, this deliberate state economic policy weaponized tariffs, charters, and colonies to hoard precious metals."
+        ]
+      },
+      {
+        id: "magellan",
+        term: "Ferdinand Magellan",
+        aliases: ["ferdinand magellan", "magellan"],
+        short: "Portuguese navigator sailing for Spain whose 1519 expedition first circumnavigated Earth.",
+        hook: "Magellan = 1519 first circumnavigation (Spanish flag; killed in Philippines, Elcano finished).",
+        confusables: ["cortes", "pizarro", "caravel", "galleons", "tordesillas", "columbian_exchange"],
+        prompts: [
+          "A Portuguese navigator sailing under the Spanish flag whose 1519 voyage discovered a southern strait into the Pacific and achieved the first circumnavigation of the globe.",
+          "Seeking a western maritime route to the Spice Islands for Spain, this explorer crossed the vast Pacific before being killed in Mactan in the Philippines in 1521.",
+          "Although only one of five ships—led home by Juan Sebastián Elcano—completed the three-year journey, this commander's expedition proved all major oceans were interconnected.",
+          "Unlike conquistadors who marched inland to topple Aztec or Inca capitals, this navigator led an oceanic expedition across the Pacific to reach Southeast Asian spice markets."
+        ]
+      },
+      {
+        id: "columbian_exchange",
+        term: "Columbian Exchange",
+        aliases: ["columbian exchange"],
+        short: "Post-1492 transatlantic transfer of crops, animals, diseases, and people between Old and New Worlds.",
+        hook: "Biological swap after 1492: Old World brought smallpox/horses/sugar; New World gave potatoes/maize/tobacco.",
+        confusables: ["mercantilism", "tordesillas", "encomienda", "engenhos", "galleons", "caravel"],
+        prompts: [
+          "The unprecedented post-1492 biological and demographic transfer of crops, domesticated livestock, pathogens, and human populations between Afro-Eurasia and the Americas.",
+          "By bringing calorie-rich potatoes and maize to Eurasia while introducing horses, cattle, and deadly smallpox to the Americas, this global phenomenon reshaped world population totals.",
+          "Distinct from purely commercial policies, this ecological reconnection permanently linked previously isolated hemispheres, triggering massive native mortality alongside Old World population booms.",
+          "Unlike deliberate state trade policies aimed at hoarding gold, this unintended post-1492 ecological and biological swap transformed global diets, ecosystems, and demographics."
+        ]
+      },
+      {
+        id: "engenhos",
+        term: "Engenhos",
+        aliases: ["engenhos", "engenho"],
+        short: "Portuguese colonial sugar plantations and mills in Brazil run on enslaved African labor.",
+        hook: "Engenhos sounds like 'engines' — Brazilian sugar mills/plantations where enslaved Africans worked brutal shifts.",
+        confusables: ["encomienda", "mullatoes", "maroon_wars", "dahomey", "mercantilism", "mirs"],
+        prompts: [
+          "Portuguese colonial sugar plantations and processing mills in Brazil that relied heavily on enslaved African labor and generated enormous export wealth.",
+          "Combining massive cane fields with dangerous crushing rollers and boiling houses, these Brazilian estates drove relentless demand for enslaved Africans due to horrific mortality rates.",
+          "Planter elites controlling these lucrative South American sugar complexes dominated colonial Brazilian society and politics while supplying European sweet tooth demand.",
+          "Unlike mainland Spanish tribute grants exploiting Indigenous villagers, these Portuguese coastal Brazilian complexes were mechanized cane-refining estates powered by enslaved Africans."
+        ]
+      },
+      {
+        id: "creoles",
+        term: "Creoles",
+        aliases: ["creoles", "creole", "criollos", "criollo"],
+        short: "Full European-descent elites born in the Americas, ranked just below Peninsulares.",
+        hook: "Creoles (Criollos) = 100% European blood, born in the AMERICAS — rich landowners resenting Peninsulares.",
+        confusables: ["peninsular", "mestizos", "mullatoes", "encomienda", "sepoys", "ulama"],
+        prompts: [
+          "People of full European descent born in the Americas who owned vast estates and mines yet ranked below European-born officials in the Spanish colonial casta system.",
+          "Growing wealthy as merchants and hacienda owners, this American-born white class increasingly resented imperial taxes and exclusion from top royal offices—fueling later independence movements.",
+          "Sitting on the second rung of Latin American social hierarchy, this group shared European ancestry with top rulers but lacked Iberian birthplace privileges.",
+          "Unlike mixed-heritage populations or Spanish-born governors arriving from Madrid, this colonial group had pure European lineage combined with birthplace in the Americas."
+        ]
+      },
+      {
+        id: "nzinga",
+        term: "Queen Nzinga (Ana Nzinga)",
+        aliases: ["queen nzinga", "ana nzinga", "nzinga", "queen nzinga (ana nzinga)"],
+        short: "17th-century ruler of Ndongo & Matamba (Angola) who resisted Portuguese slave raids.",
+        hook: "Queen Nzinga (Angola): shrewd diplomat + warrior who allied with the Dutch to fight Portuguese slave raids.",
+        confusables: ["dahomey", "maroon_wars", "vodun", "pueblo_revolt", "metacoms_war", "maratha"],
+        prompts: [
+          "The 17th-century ruler of Ndongo and Matamba (in modern Angola) who resisted Portuguese conquest and slave raids for decades through guerrilla warfare and shifting alliances.",
+          "Converting strategically to Catholicism, forging a temporary alliance with the Dutch, and sheltering runaway captives, this Central African monarch kept her kingdom independent into old age.",
+          "Famous for refusing to sit on a floor mat during negotiations with a Portuguese governor—using an attendant as a chair to claim equal royal status—this leader fought Iberian encroachment.",
+          "Unlike coastal West African kings who enriched their state by selling captives for European guns, this Central African monarch waged a 30-year struggle to block Portuguese domination."
+        ]
+      },
+      {
+        id: "mirs",
+        term: "Mirs",
+        aliases: ["mirs", "mir", "obshchina"],
+        short: "Self-governing Russian peasant village communes that redistributed farmland and shared taxes.",
+        hook: "Mirs = Russian peasant village communes (collective land sharing & tax responsibility).",
+        confusables: ["pugachev", "encomienda", "engenhos", "ulama", "primogeniture", "sepoys"],
+        prompts: [
+          "Self-governing Russian peasant village communes that periodically redistributed arable land among households and collectively managed taxes and serf obligations.",
+          "Acting as the local backbone of rural Russian society, these village councils enforced communal farming schedules and held all members jointly liable for state dues.",
+          "Designed to prevent individual peasant poverty from depriving nobles or the tsar of revenue, this collective agrarian institution persisted even long after serf emancipation.",
+          "Unlike Western European inheritance laws concentrating land in eldest sons, this Russian rural institution held farmland collectively and reallocated strips by family size."
+        ]
+      },
+      {
+        id: "mestizos",
+        term: "Mestizos",
+        aliases: ["mestizos", "mestizo"],
+        short: "People of mixed European and Indigenous American ancestry in the colonial casta system.",
+        hook: "Mestizos = Spanish/European + Indigenous American ancestry (largest mixed group in Mexico/Andes).",
+        confusables: ["mullatoes", "creoles", "peninsular", "encomienda", "pueblo_revolt", "cortes"],
+        prompts: [
+          "People of mixed European and Indigenous American ancestry within the Spanish colonial casta racial hierarchy.",
+          "Emerging rapidly in former Aztec and Inca heartlands where few Spanish women initially migrated, this demographic grew to form a vast share of mainland Latin America's population.",
+          "Ranked below American-born whites yet above enslaved Africans and unassimilated natives in colonial paintings and law, this group commonly worked as artisans, shopkeepers, and small farmers.",
+          "Unlike people of mixed European and African ancestry in sugar colonies, this casta group specifically combined European and Indigenous American heritage."
+        ]
+      },
+      {
+        id: "sepoys",
+        term: "Sepoys",
+        aliases: ["sepoys", "sepoy"],
+        short: "Indian soldiers trained and armed to fight in European (especially British EIC) armies.",
+        hook: "Sepoys = South Asian soldiers employed by European East India Companies (later rebelled in 1857!).",
+        confusables: ["maratha", "ulama", "mirs", "maroon_wars", "pugachev", "encomienda"],
+        prompts: [
+          "Indigenous Indian soldiers recruited, uniformed, and trained in European firearm tactics to serve in colonial forces—especially the British East India Company army.",
+          "Allowing a small European trading company to conquer vast territories across South Asia without shipping huge armies from Europe, these local troops formed the backbone of British power in India.",
+          "Paid by European chartered companies and commanded by British officers, these South Asian infantrymen later sparked the massive 1857 anti-colonial uprising over cultural and religious grievances.",
+          "Unlike independent Hindu warrior confederacies fighting Mughal expansion, these South Asian soldiers fought directly on the payroll of European joint-stock trading companies."
+        ]
+      },
+      {
+        id: "cortes",
+        term: "Hernan Cortes",
+        aliases: ["hernan cortes", "hernán cortés", "cortes", "cortés", "hernan cortez", "cortez"],
+        short: "Spanish conquistador who conquered the Aztec Empire in Mexico (1519–1521).",
+        hook: "Cortes = Mexico / Aztec (Moctezuma, Tlaxcalan allies). Pizarro = Peru / Inca.",
+        confusables: ["pizarro", "magellan", "encomienda", "mestizos", "tordesillas", "peninsular"],
+        prompts: [
+          "The Spanish conquistador who toppled the Aztec Empire in central Mexico (1519–1521) with the crucial help of Indigenous Tlaxcalan allies, interpreters like La Malinche, and smallpox.",
+          "Scuttling his own ships at Veracruz so his men could not retreat, this adventurer marched to Tenochtitlan and seized Emperor Moctezuma II.",
+          "Capitalizing on deep resentment among tributary subject peoples ruled by the Mexica Triple Alliance, this commander built an Indigenous coalition to besiege the island capital.",
+          "Unlike the Spanish commander who overthrew the Andean Inca Empire in the 1530s, this conquistador conquered Mesoamerica's dominant empire more than a decade earlier."
+        ]
+      },
+      {
+        id: "pugachev",
+        term: "Yemelyan Pugachev",
+        aliases: ["yemelyan pugachev", "pugachev"],
+        short: "Cossack leader of Russia's largest serf & peasant rebellion (1773–1775) against Catherine the Great.",
+        hook: "Pugachev (1773 Russia): claimed to be murdered Tsar Peter III -> led massive serf revolt -> Catherine crushed it & tightened serfdom.",
+        confusables: ["mirs", "pueblo_revolt", "metacoms_war", "gloucester", "maroon_wars", "glorious_revolution"],
+        prompts: [
+          "A Cossack rebel leader who sparked the largest peasant and serf uprising in Russian history (1773–1775) against Empress Catherine the Great.",
+          "Claiming to be the miraculously survived Tsar Peter III, this insurgent promised to abolish serfdom, taxes, and military conscription—leading Catherine to tighten noble control over serfs after his execution.",
+          "Uniting Cossacks, runaway serfs, Ural factory workers, and ethnic minorities across eastern Russia, this rebel briefly threatened imperial control before being betrayed and executed in Moscow.",
+          "Unlike colonial uprisings in the Americas against English or Spanish rule, this 1770s Eurasian insurrection challenged tsarist autocracy and serfdom from within Russia."
+        ]
+      },
+      {
+        id: "maratha",
+        term: "Maratha Empire",
+        aliases: ["maratha empire", "maratha", "marathas", "maratha confederacy"],
+        short: "Hindu warrior confederacy that resisted Mughal dominance and ruled much of 18th-century India.",
+        hook: "Maratha = Hindu warrior state in western India (Shivaji) that bled the Mughals dry after Aurangzeb.",
+        confusables: ["sepoys", "ulama", "dahomey", "pugachev", "nzinga", "pueblo_revolt"],
+        prompts: [
+          "A Hindu warrior confederacy rising from western India in the late 17th century that fought relentless guerrilla wars against Mughal expansion and became India's dominant power in the 1700s.",
+          "Founded under Shivaji Bhonsle and energized by Hindu resistance to Emperor Aurangzeb's harsh religious taxes and Deccan wars, this state hollowed out Mughal imperial authority.",
+          "Eventually stretching across central and northern India before fragmenting and falling to the British East India Company, this confederacy collected chauth tribute across the subcontinent.",
+          "Unlike Indian soldiers serving inside European company armies, this powerful indigenous South Asian polity carved out an independent post-Mughal empire of its own."
+        ]
+      },
+      {
+        id: "pueblo_revolt",
+        term: "Pueblo Revolt",
+        aliases: ["pueblo revolt", "pope's rebellion", "popes rebellion", "pueblo"],
+        short: "1680 New Mexico uprising led by Popé that expelled Spanish colonizers for 12 years.",
+        hook: "1680 New Mexico (Popé): Actually SUCCEEDED — drove Spain out for 12 years and forced religious tolerance later.",
+        confusables: ["metacoms_war", "maroon_wars", "pugachev", "gloucester", "montreal", "vodun"],
+        prompts: [
+          "A coordinated 1680 uprising led by the spiritual leader Popé in New Mexico that successfully drove Spanish colonizers and Franciscan missionaries out of the region for twelve years.",
+          "Triggered by severe drought, forced encomienda tribute, and the suppression of traditional kachina ceremonies, this 1680 rebellion stands as the most successful Indigenous overthrow of European rule in North America.",
+          "When Spanish forces eventually returned to Santa Fe in the 1690s after this uprising, colonial authorities had to abandon coerced labor drafts and tolerate Indigenous religious practices.",
+          "Unlike the 1675 New England conflict where English militias shattered Indigenous coalitions, this 1680 Southwestern uprising successfully expelled European rulers for over a decade."
+        ]
+      },
+      {
+        id: "maroon_wars",
+        term: "Maroon Wars",
+        aliases: ["maroon wars", "maroon war", "maroons"],
+        short: "Conflicts between colonial forces and self-governing communities of escaped enslaved Africans.",
+        hook: "Maroons = runaway enslaved Africans who built free mountain strongholds (esp. Jamaica/Queen Nanny) and fought colonial troops.",
+        confusables: ["gloucester", "pueblo_revolt", "metacoms_war", "nzinga", "dahomey", "vodun"],
+        prompts: [
+          "Protracted 17th- and 18th-century conflicts in the Caribbean (especially Jamaica) and the Americas between European colonial troops and autonomous communities of escaped enslaved Africans.",
+          "Using ambush guerrilla tactics in dense mountainous interiors, leaders like Queen Nanny forced British colonial officials into formal treaties recognizing their communities' freedom and land.",
+          "These sustained military campaigns revealed how self-emancipated Africans built durable, independent societies right on the edges of brutal sugar-plantation colonies.",
+          "Unlike short-lived multi-racial servant plots in Virginia or peasant revolts in Russia, these Caribbean wars pitted imperial militias against entrenched mountain settlements of runaway Africans."
+        ]
+      },
+      {
+        id: "gloucester",
+        term: "Gloucester County Rebellion",
+        aliases: ["gloucester county rebellion", "gloucester rebellion", "gloucester"],
+        short: "1663 Virginia conspiracy where indentured servants & enslaved Africans united against planters.",
+        hook: "1663 Virginia: white indentured servants + Black enslaved workers teamed up -> frightened elites hardened race laws.",
+        confusables: ["maroon_wars", "pugachev", "pueblo_revolt", "metacoms_war", "primogeniture", "glorious_revolution"],
+        prompts: [
+          "A 1663 conspiracy in colonial Virginia in which white indentured servants and enslaved Africans plotted together against wealthy planters, prompting elites to harden racial divisions.",
+          "Exposed by an informant before open fighting began, this early Chesapeake labor plot terrified colonial lawmakers because bound European and African workers attempted cross-racial solidarity.",
+          "Anticipating later colonial anxieties seen in Bacon's Rebellion, this 1663 Virginia episode encouraged planter elites to grant small privileges to poor whites while deepening racial chattel slavery.",
+          "Unlike mountain guerrilla wars fought by independent escaped communities in Jamaica, this 1663 Chesapeake uprising was an early cross-racial conspiracy of bound plantation laborers."
+        ]
+      }
+    ];
+
+    const TERM_MAP = Object.fromEntries(TERMS.map(t => [t.id, t]));
+    const STORAGE_KEY = "apwh_mastery_v2";
+    const STARTER_BASELINES = { mc_def: 3200, mc_term: 5200, recall: 3500, type: 6500 };
+
+    const FORMAT_MODES = [
+      { id: "smart", label: "Smart Mix" },
+      { id: "mc", label: "Hard MC Only" },
+      { id: "recall", label: "Blind Recall" },
+      { id: "type", label: "Type-In" }
+    ];
+
+    const DIR_MODES = [
+      { id: "defToTerm", label: "Def → Term" },
+      { id: "termToDef", label: "Term → Def" },
+      { id: "mixed", label: "Mixed Dir" }
+    ];
+
+    const SPEED_MODES = [
+      { id: "fast", label: "Fast", correctDelay: 550 },
+      { id: "turbo", label: "Turbo", correctDelay: 220 },
+      { id: "manual", label: "Manual", correctDelay: null }
+    ];
+
+    let state = loadState();
+    let round = state.round || 0;
+    let currentQ = null;
+    let answered = false;
+    let recallRevealed = false;
+    let blurActive = false;
+    let blurTimeout = null;
+    let autoAdvanceTimeout = null;
+    let timerInterval = null;
+
+    // Tab-safe active stopwatch
+    let activeElapsedMs = 0;
+    let segmentStartMs = 0;
+    let stopwatchRunning = false;
+
+    let session = { attempts: 0, correct: 0, streak: 0 };
+    let reportFilter = "all";
+    let sortCol = "weight";
+    let sortDir = "desc";
+    let expandedRowId = null;
+
+    function defaultStat() {
+      return {
+        attempts: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        missDebt: 0,
+        totalTimeMs: 0,
+        totalRelRatio: 0,
+        lastTimeMs: null,
+        lastRelRatio: null,
+        lastSeenRound: -99,
+        lastPromptIdx: -1
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const p = JSON.parse(raw);
+          const stats = {};
+          TERMS.forEach(t => { stats[t.id] = { ...defaultStat(), ...(p.stats?.[t.id] || {}) }; });
+          return {
+            stats,
+            confusedWith: p.confusedWith || {},
+            baselines: { mc_def: [], mc_term: [], recall: [], type: [], ...(p.baselines || {}) },
+            requeue: Array.isArray(p.requeue) ? p.requeue : [],
+            round: p.round || 0,
+            settings: {
+              formatIdx: 0,
+              dirIdx: 0,
+              speedIdx: 0,
+              blurOptions: false,
+              ...(p.settings || {})
+            }
+          };
+        }
+      } catch (e) {}
+      const stats = {};
+      TERMS.forEach(t => { stats[t.id] = defaultStat(); });
+      return {
+        stats,
+        confusedWith: {},
+        baselines: { mc_def: [], mc_term: [], recall: [], type: [] },
+        requeue: [],
+        round: 0,
+        settings: { formatIdx: 0, dirIdx: 0, speedIdx: 0, blurOptions: false }
+      };
+    }
+
+    function saveState() {
+      state.round = round;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    // Stopwatch with tab-visibility pause + 25s AFK cap
+    function startStopwatch() {
+      activeElapsedMs = 0;
+      segmentStartMs = performance.now();
+      stopwatchRunning = !document.hidden;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(renderTimer, 100);
+      renderTimer();
+    }
+
+    function stopStopwatch() {
+      if (stopwatchRunning) {
+        activeElapsedMs += performance.now() - segmentStartMs;
+        stopwatchRunning = false;
+      }
+      clearInterval(timerInterval);
+      return Math.min(25000, Math.max(150, Math.round(activeElapsedMs)));
+    }
+
+    function currentActiveMs() {
+      const live = stopwatchRunning ? (performance.now() - segmentStartMs) : 0;
+      return Math.min(25000, activeElapsedMs + live);
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (!currentQ || answered || (currentQ.kind === "recall" && recallRevealed)) return;
+      if (document.hidden) {
+        if (stopwatchRunning) {
+          activeElapsedMs += performance.now() - segmentStartMs;
+          stopwatchRunning = false;
+        }
+      } else {
+        if (!stopwatchRunning) {
+          segmentStartMs = performance.now();
+          stopwatchRunning = true;
+        }
+      }
+    });
+
+    function getMedian(arr) {
+      if (!arr || arr.length === 0) return null;
+      const sorted = [...arr].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    }
+
+    function getBaselineMedian(bucket) {
+      const arr = state.baselines[bucket] || [];
+      const starter = STARTER_BASELINES[bucket] || 3200;
+      if (arr.length === 0) return starter;
+      const med = getMedian(arr);
+      const finalMed = arr.length < 5 ? ((5 - arr.length) * starter + arr.length * med) / 5 : med;
+      return Math.max(900, Math.round(finalMed));
+    }
+
+    function getAvgRelPace(s) {
+      return s.attempts > 0 ? s.totalRelRatio / s.attempts : null;
+    }
+
+    // Priority Score: Incorrect & unresolved missDebt heavily dominate relative time!
+    function computeWeight(id) {
+      const s = state.stats[id];
+      if (s.attempts === 0) return 24;
+
+      const smoothedErr = s.wrong / (s.attempts + 1);
+      let w = 8;
+
+      // Dominant Error Component (up to ~350+)
+      w += s.missDebt * 75;
+      w += smoothedErr * 85;
+      if (s.streak === 0 && s.wrong > 0) w += 45;
+
+      // Subordinate Relative-Time Component (capped at +24 max)
+      const avgRel = getAvgRelPace(s) || 1;
+      const worstRel = Math.max(avgRel, s.lastRelRatio || 1);
+      if (worstRel > 1.2) {
+        w += Math.min(24, Math.round((worstRel - 1.15) * 16));
+      }
+
+      // Mastery decay
+      if (s.missDebt <= 0.1 && s.streak >= 2) {
+        w -= Math.min(18, s.streak * 4);
+      }
+
+      return Math.max(2, Math.round(w));
+    }
+
+    function getStatus(id) {
+      const s = state.stats[id];
+      if (s.attempts === 0) return { label: "Unseen", cls: "" };
+      const avgRel = getAvgRelPace(s) || 1;
+      if (s.missDebt > 0.7 || (s.wrong > 0 && s.streak === 0)) {
+        return { label: "Needs Work", cls: "bad" };
+      }
+      if (s.streak >= 3 && s.missDebt <= 0.15 && avgRel <= 1.25) {
+        return { label: "Mastered", cls: "good" };
+      }
+      if (avgRel > 1.3 || (s.lastRelRatio && s.lastRelRatio > 1.35)) {
+        return { label: "Slow Pace", cls: "warn" };
+      }
+      if (s.streak >= 2 && s.missDebt <= 0.4) {
+        return { label: "Recall Ready", cls: "purple" };
+      }
+      return { label: "Learning", cls: "accent" };
+    }
+
+    let focusWeakOnly = false;
+
+    function pickNextTerm() {
+      // 1. Check active Re-Queue first (for missed words after 2-3 intervening questions)
+      const dueIdx = state.requeue.findIndex(item => item.dueAt <= round && round - state.stats[item.id].lastSeenRound >= 2);
+      if (dueIdx !== -1) {
+        const dueItem = state.requeue.splice(dueIdx, 1)[0];
+        return { termObj: TERM_MAP[dueItem.id], isRequeue: true };
+      }
+
+      // 2. Otherwise sample from weighted pool
+      let pool = TERMS;
+      if (focusWeakOnly) {
+        const weak = TERMS.filter(t => getStatus(t.id).label !== "Mastered");
+        if (weak.length > 0) pool = weak;
+      }
+
+      const nonRecent = pool.filter(t => round - state.stats[t.id].lastSeenRound > 2);
+      const candidates = nonRecent.length >= 1 ? nonRecent : pool;
+
+      let total = 0;
+      const weights = candidates.map(t => {
+        const w = computeWeight(t.id);
+        total += w;
+        return w;
+      });
+
+      let r = Math.random() * total;
+      for (let i = 0; i < candidates.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return { termObj: candidates[i], isRequeue: false };
+      }
+      return { termObj: candidates[candidates.length - 1], isRequeue: false };
+    }
+
+    function pickPromptAngle(termObj) {
+      const s = state.stats[termObj.id];
+      const validIndices = [0, 1, 2, 3].filter(i => i !== s.lastPromptIdx);
+      const chosen = validIndices[Math.floor(Math.random() * validIndices.length)];
+      s.lastPromptIdx = chosen;
+      return { text: termObj.prompts[chosen], angleIdx: chosen };
+    }
+
+    function pickHardDistractors(target) {
+      const chosenIds = new Set([target.id]);
+      const result = [];
+
+      // 1. Prioritize past confused-with terms!
+      const confMap = state.confusedWith[target.id] || {};
+      const pastConfused = Object.entries(confMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([id]) => id)
+        .filter(id => TERM_MAP[id] && !chosenIds.has(id));
+
+      for (const id of pastConfused) {
+        if (result.length >= 2) break;
+        chosenIds.add(id);
+        result.push(TERM_MAP[id]);
+      }
+
+      // 2. Pull closely related confusable terms (lightly shuffled within top cluster)
+      const related = shuffle(target.confusables.slice(0, 6));
+      for (const id of related) {
+        if (result.length >= 3) break;
+        if (!chosenIds.has(id) && TERM_MAP[id]) {
+          chosenIds.add(id);
+          result.push(TERM_MAP[id]);
+        }
+      }
+
+      // Fallback if ever needed
+      if (result.length < 3) {
+        for (const t of shuffle(TERMS)) {
+          if (result.length >= 3) break;
+          if (!chosenIds.has(t.id)) {
+            chosenIds.add(t.id);
+            result.push(t);
+          }
+        }
+      }
+      return result;
+    }
+
+    function decideQuestionKind(termObj) {
+      const fmt = FORMAT_MODES[state.settings.formatIdx].id;
+      if (fmt === "mc") return "mc";
+      if (fmt === "recall") return "recall";
+      if (fmt === "type") return "type";
+
+      // Smart Mix progression:
+      const s = state.stats[termObj.id];
+      if (s.attempts === 0 || s.streak < 2 || s.missDebt > 0.6) return "mc";
+      if (s.streak === 2) return "recall";
+      const roll = Math.random();
+      if (roll < 0.4) return "type";
+      if (roll < 0.75) return "recall";
+      return "mc";
+    }
+
+    function decideDirection() {
+      const dir = DIR_MODES[state.settings.dirIdx].id;
+      if (dir === "mixed") return Math.random() < 0.6 ? "defToTerm" : "termToDef";
+      return dir;
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function nextQuestion() {
+      clearTimeout(autoAdvanceTimeout);
+      clearTimeout(blurTimeout);
+      answered = false;
+      recallRevealed = false;
+      round++;
+
+      const { termObj, isRequeue } = pickNextTerm();
+      const kind = decideQuestionKind(termObj);
+      const direction = kind === "mc" ? decideDirection() : "defToTerm";
+      const bucket = kind === "mc" ? (direction === "defToTerm" ? "mc_def" : "mc_term") : kind;
+      const promptInfo = pickPromptAngle(termObj);
+
+      let options = [];
+      if (kind === "mc") {
+        const distractors = pickHardDistractors(termObj).map(d => ({
+          termObj: d,
+          promptText: direction === "termToDef" ? pickPromptAngle(d).text : d.term
+        }));
+        options = shuffle([
+          { termObj, promptText: direction === "termToDef" ? promptInfo.text : termObj.term },
+          ...distractors
+        ]);
+      }
+
+      currentQ = {
+        target: termObj,
+        isRequeue,
+        kind,
+        direction,
+        bucket,
+        promptInfo,
+        options,
+        baselineMs: getBaselineMedian(bucket)
+      };
+
+      renderQuestion();
+      startStopwatch();
+    }
+
+    function renderTimer() {
+      if (!currentQ) return;
+      const ms = currentActiveMs();
+      const el = document.getElementById("qTimer");
+      el.textContent = (ms / 1000).toFixed(1) + "s";
+      el.classList.toggle("slow", ms > currentQ.baselineMs * 1.3);
+      document.getElementById("timerBaseline").textContent =
+        `1.0x = ${(currentQ.baselineMs / 1000).toFixed(1)}s`;
+    }
+
+    function renderQuestion() {
+      const { target, isRequeue, kind, direction, promptInfo, options } = currentQ;
+      const s = state.stats[target.id];
+      const status = getStatus(target.id);
+
+      // Tags
+      const tagsEl = document.getElementById("qTags");
+      tagsEl.innerHTML = "";
+
+      const kindLabels = { mc: "Hard Confusable MC", recall: "Blind Active Recall", type: "Type-In Mastery" };
+      const kindPill = document.createElement("span");
+      kindPill.className = "pill " + (kind === "mc" ? "accent" : "purple");
+      kindPill.textContent = kindLabels[kind];
+      tagsEl.appendChild(kindPill);
+
+      const stPill = document.createElement("span");
+      stPill.className = "pill " + status.cls;
+      stPill.textContent = status.label;
+      tagsEl.appendChild(stPill);
+
+      if (isRequeue) {
+        const rq = document.createElement("span");
+        rq.className = "pill bad";
+        rq.textContent = "Missed Comeback";
+        tagsEl.appendChild(rq);
+      } else if (s.wrong > 0) {
+        const wp = document.createElement("span");
+        wp.className = "pill bad";
+        wp.textContent = `Missed ${s.wrong}x`;
+        tagsEl.appendChild(wp);
+      }
+
+      if (s.attempts > 0 && getAvgRelPace(s) > 1.3) {
+        const sp = document.createElement("span");
+        sp.className = "pill warn";
+        sp.textContent = `Pace ${getAvgRelPace(s).toFixed(2)}x`;
+        tagsEl.appendChild(sp);
+      }
+
+      const angleNames = ["Definition", "Significance", "Context Clue", "Contrast Clue"];
+      const angPill = document.createElement("span");
+      angPill.className = "pill";
+      angPill.textContent = `Angle: ${angleNames[promptInfo.angleIdx]}`;
+      tagsEl.appendChild(angPill);
+
+      // Prompt
+      const pLabel = document.getElementById("promptLabel");
+      const pText = document.getElementById("promptText");
+      if (kind === "mc" && direction === "termToDef") {
+        pLabel.textContent = "Pick the accurate APWH description for this term:";
+        pText.textContent = target.term;
+      } else if (kind === "recall") {
+        pLabel.textContent = "Retrieve the APWH term from memory (no choices):";
+        pText.textContent = promptInfo.text;
+      } else if (kind === "type") {
+        pLabel.textContent = "Type the APWH term matching this prompt:";
+        pText.textContent = promptInfo.text;
+      } else {
+        pLabel.textContent = "Select the matching APWH term (closely related distractors):";
+        pText.textContent = promptInfo.text;
+      }
+
+      // Toggle UI panels
+      document.getElementById("mcArea").classList.toggle("hidden", kind !== "mc");
+      document.getElementById("recallArea").classList.toggle("hidden", kind !== "recall");
+      document.getElementById("typeArea").classList.toggle("hidden", kind !== "type");
+
+      if (kind === "mc") {
+        const grid = document.getElementById("optionsGrid");
+        grid.classList.toggle("def-mode", direction === "termToDef");
+        grid.innerHTML = "";
+        options.forEach((opt, i) => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.innerHTML = `<span class="opt-key">${i + 1}</span><span>${opt.promptText}</span>`;
+          btn.addEventListener("click", () => selectMC(i));
+          grid.appendChild(btn);
+        });
+
+        // Pre-Choice Blur logic
+        if (state.settings.blurOptions) {
+          setBlurState(true);
+          blurTimeout = setTimeout(() => setBlurState(false), 1600);
+        } else {
+          setBlurState(false);
+        }
+      } else if (kind === "recall") {
+        document.getElementById("recallHiddenState").classList.remove("hidden");
+        document.getElementById("recallShownState").classList.add("hidden");
+      } else if (kind === "type") {
+        const inp = document.getElementById("typeInput");
+        inp.value = "";
+        inp.disabled = false;
+        inp.className = "type-input";
+        document.getElementById("typeHintText").classList.add("hidden");
+        document.getElementById("typeHintText").textContent = "";
+        setTimeout(() => inp.focus(), 20);
+      }
+
+      // Reset feedback
+      const fb = document.getElementById("feedbackBar");
+      fb.className = "feedback-bar";
+      document.getElementById("feedbackMsg").textContent =
+        kind === "mc" ? "Keys 1–4 or click an option" :
+        kind === "recall" ? "Press Space when you've recalled the answer" :
+        "Type the term and press Enter";
+      document.getElementById("feedbackHook").textContent =
+        focusWeakOnly ? "Focus Mode active: drilling missed, slow, and unseen terms." : "Wrong answers queue a 3-round comeback and update your confusion matrix.";
+      document.getElementById("nextBtn").classList.add("hidden");
+      document.getElementById("contrastBox").classList.add("hidden");
+      document.getElementById("contrastBox").innerHTML = "";
+
+      updateHUD();
+    }
+
+    function setBlurState(active) {
+      blurActive = active;
+      document.getElementById("optionsGrid").classList.toggle("blurred", active);
+      document.getElementById("blurOverlay").classList.toggle("hidden", !active);
+    }
+
+    function recordOutcome(isCorrect, elapsedMs, opts = {}) {
+      const { chosenWrongObj = null, forcedSlow = false } = opts;
+      const target = currentQ.target;
+      const bucket = currentQ.bucket;
+      const baseline = currentQ.baselineMs;
+
+      let relRatio = Math.max(0.25, Math.min(4.0, elapsedMs / baseline));
+      if (forcedSlow) relRatio = Math.max(relRatio, 1.55);
+
+      // Update mode baseline rolling window (max 80 samples)
+      if (!state.baselines[bucket]) state.baselines[bucket] = [];
+      state.baselines[bucket].push(elapsedMs);
+      if (state.baselines[bucket].length > 80) state.baselines[bucket].shift();
+
+      const s = state.stats[target.id];
+      s.attempts += 1;
+      s.totalTimeMs += elapsedMs;
+      s.totalRelRatio += relRatio;
+      s.lastTimeMs = elapsedMs;
+      s.lastRelRatio = relRatio;
+      s.lastSeenRound = round;
+
+      if (isCorrect) {
+        s.correct += 1;
+        s.streak += 1;
+        const recovery = relRatio <= 1.35 ? 0.45 : 0.2;
+        s.missDebt = Math.max(0, Number((s.missDebt - recovery).toFixed(2)));
+        session.correct += 1;
+        session.streak += 1;
+      } else {
+        s.wrong += 1;
+        s.streak = 0;
+        s.missDebt = Math.min(6, Number((s.missDebt + 1.35).toFixed(2)));
+        session.streak = 0;
+
+        // Schedule short-spacing retrieval comeback (~3 questions later)
+        state.requeue = state.requeue.filter(item => item.id !== target.id);
+        state.requeue.push({ id: target.id, dueAt: round + 3 });
+
+        // Log confusion pair if MC wrong choice
+        if (chosenWrongObj) {
+          if (!state.confusedWith[target.id]) state.confusedWith[target.id] = {};
+          state.confusedWith[target.id][chosenWrongObj.id] =
+            (state.confusedWith[target.id][chosenWrongObj.id] || 0) + 1;
+        }
+      }
+
+      session.attempts += 1;
+      saveState();
+      updateHUD(relRatio);
+      return relRatio;
+    }
+
+    function showFeedback(isCorrect, elapsedMs, relRatio, chosenWrongObj = null, extraNote = "") {
+      const target = currentQ.target;
+      const fb = document.getElementById("feedbackBar");
+      const msg = document.getElementById("feedbackMsg");
+      const hook = document.getElementById("feedbackHook");
+      const nextBtn = document.getElementById("nextBtn");
+      const contrast = document.getElementById("contrastBox");
+
+      const sec = (elapsedMs / 1000).toFixed(2) + "s";
+      const paceTag = relRatio <= 0.85 ? `${relRatio.toFixed(2)}x Fast` :
+                      relRatio > 1.35 ? `${relRatio.toFixed(2)}x Slow` : `${relRatio.toFixed(2)}x Normal`;
+
+      fb.className = "feedback-bar " + (isCorrect ? "is-correct" : "is-wrong");
+
+      if (isCorrect) {
+        msg.textContent = `Correct in ${sec} (${paceTag})${extraNote ? " • " + extraNote : ""}`;
+        hook.textContent = `Hook: ${target.hook}`;
+      } else {
+        msg.textContent = `Missed (${sec}) — Answer: ${target.term} • Queued for comeback in ~3 questions`;
+        hook.textContent = `Hook: ${target.hook}`;
+
+        // Side-by-side contrast box!
+        contrast.classList.remove("hidden");
+        if (chosenWrongObj) {
+          contrast.innerHTML = `
+            <div class="contrast-card right">
+              <div class="contrast-title" style="color:#86efac">✓ ${target.term}</div>
+              <div>${target.short}</div>
+            </div>
+            <div class="contrast-card picked">
+              <div class="contrast-title" style="color:#fca5a5">✕ You picked: ${chosenWrongObj.term}</div>
+              <div>${chosenWrongObj.short}</div>
+            </div>
+          `;
+        } else {
+          contrast.innerHTML = `
+            <div class="contrast-card right" style="grid-column: 1 / -1;">
+              <div class="contrast-title" style="color:#86efac">✓ ${target.term}</div>
+              <div>${target.short}</div>
+            </div>
+          `;
+        }
+      }
+
+      nextBtn.classList.remove("hidden");
+    }
+
+    // MC selection
+    function selectMC(idx) {
+      if (answered || !currentQ || currentQ.kind !== "mc") return;
+      if (blurActive) {
+        setBlurState(false);
+        clearTimeout(blurTimeout);
+        return;
+      }
+
+      answered = true;
+      const elapsed = stopStopwatch();
+      const chosen = currentQ.options[idx].termObj;
+      const isCorrect = chosen.id === currentQ.target.id;
+
+      const btns = document.querySelectorAll("#optionsGrid .option-btn");
+      btns.forEach((btn, i) => {
+        btn.disabled = true;
+        const optTerm = currentQ.options[i].termObj;
+        if (optTerm.id === currentQ.target.id) btn.classList.add("correct");
+        else if (i === idx && !isCorrect) btn.classList.add("wrong");
+        else btn.classList.add("dimmed");
+      });
+
+      const rel = recordOutcome(isCorrect, elapsed, { chosenWrongObj: isCorrect ? null : chosen });
+      showFeedback(isCorrect, elapsed, rel, isCorrect ? null : chosen);
+
+      // Only auto-advance on CORRECT answers so user always learns from mistakes!
+      const speedCfg = SPEED_MODES[state.settings.speedIdx];
+      if (isCorrect && speedCfg.correctDelay !== null) {
+        autoAdvanceTimeout = setTimeout(() => {
+          if (!isReportOpen()) nextQuestion();
+        }, speedCfg.correctDelay);
+      }
+    }
+
+    // Blind Recall handlers
+    function revealRecall() {
+      if (!currentQ || currentQ.kind !== "recall" || recallRevealed) return;
+      recallRevealed = true;
+      currentQ.recallTimeMs = stopStopwatch();
+      document.getElementById("recallHiddenState").classList.add("hidden");
+      document.getElementById("recallShownState").classList.remove("hidden");
+      document.getElementById("recallAnswerText").textContent = currentQ.target.term;
+      document.getElementById("recallHookText").textContent = `${currentQ.target.short} — ${currentQ.target.hook}`;
+      document.getElementById("feedbackMsg").textContent = "Honest self-grade: 1 Nailed, 2 Hesitated, 3 Missed";
+    }
+
+    function gradeRecall(grade) {
+      if (!currentQ || currentQ.kind !== "recall" || !recallRevealed || answered) return;
+      answered = true;
+      const elapsed = currentQ.recallTimeMs || 2500;
+      const isCorrect = grade !== "bad";
+      const forcedSlow = grade === "hard";
+      const rel = recordOutcome(isCorrect, elapsed, { forcedSlow });
+      showFeedback(isCorrect, elapsed, rel, null, grade === "hard" ? "Marked shaky" : "");
+
+      const speedCfg = SPEED_MODES[state.settings.speedIdx];
+      if (isCorrect && speedCfg.correctDelay !== null) {
+        autoAdvanceTimeout = setTimeout(() => {
+          if (!isReportOpen()) nextQuestion();
+        }, speedCfg.correctDelay);
+      }
+    }
+
+    // Fuzzy Type-In Matching
+    function normalizeText(str) {
+      return str
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\(.*?\)/g, " ")
+        .replace(/[^a-z0-9\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function levenshtein(a, b) {
+      const m = a.length, n = b.length;
+      const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        }
+      }
+      return dp[m][n];
+    }
+
+    function checkTypedAnswer(raw) {
+      const input = normalizeText(raw);
+      if (!input) return { ok: false, exact: false };
+      const t = currentQ.target;
+      const candidates = [normalizeText(t.term), ...t.aliases.map(normalizeText)];
+      for (const c of candidates) {
+        if (!c) continue;
+        if (input === c) return { ok: true, exact: true };
+        const maxDist = c.length >= 7 ? 2 : 1;
+        if (levenshtein(input, c) <= maxDist) return { ok: true, exact: false };
+      }
+      return { ok: false, exact: false };
+    }
+
+    function submitTypeAnswer() {
+      if (!currentQ || currentQ.kind !== "type" || answered) return;
+      answered = true;
+      const elapsed = stopStopwatch();
+      const inp = document.getElementById("typeInput");
+      inp.disabled = true;
+
+      const res = checkTypedAnswer(inp.value);
+      inp.classList.add(res.ok ? "ok" : "err");
+      const rel = recordOutcome(res.ok, elapsed);
+      showFeedback(res.ok, elapsed, rel, null, res.ok && !res.exact ? `Accepted (${currentQ.target.term})` : "");
+
+      const speedCfg = SPEED_MODES[state.settings.speedIdx];
+      if (res.ok && speedCfg.correctDelay !== null) {
+        autoAdvanceTimeout = setTimeout(() => {
+          if (!isReportOpen()) nextQuestion();
+        }, speedCfg.correctDelay + 250);
+      }
+    }
+
+    function showTypeHint() {
+      if (!currentQ || currentQ.kind !== "type" || answered) return;
+      const clean = currentQ.target.term.replace(/\s*\(.*?\)/g, "");
+      const masked = clean.split(" ").map(w => w[0] + w.slice(1).replace(/[a-zA-Z]/g, "_")).join("  ");
+      const el = document.getElementById("typeHintText");
+      el.textContent = "Hint: " + masked;
+      el.classList.remove("hidden");
+    }
+
+    function updateHUD(lastRelRatio = null) {
+      const acc = session.attempts > 0 ? Math.round((session.correct / session.attempts) * 100) + "%" : "—";
+      document.getElementById("hudAcc").textContent = acc;
+      document.getElementById("hudAttempts").textContent = `${session.attempts} answered`;
+
+      const bucket = currentQ ? currentQ.bucket : "mc_def";
+      const med = getBaselineMedian(bucket);
+      document.getElementById("hudBaseline").textContent = (med / 1000).toFixed(2) + "s";
+      if (lastRelRatio !== null) {
+        document.getElementById("hudLastPace").textContent = `Last answer: ${lastRelRatio.toFixed(2)}x pace`;
+      }
+
+      document.getElementById("hudRequeue").textContent = state.requeue.length;
+      document.getElementById("hudStreak").textContent = `Streak: ${session.streak}`;
+
+      const mastered = TERMS.filter(t => getStatus(t.id).label === "Mastered").length;
+      const needsWork = TERMS.filter(t => getStatus(t.id).label === "Needs Work").length;
+      document.getElementById("hudMastered").textContent = `${mastered} / ${TERMS.length}`;
+      document.getElementById("hudWeak").textContent = `${needsWork} needing work`;
+
+      // Top buttons
+      document.getElementById("formatBtn").innerHTML = `Format: ${FORMAT_MODES[state.settings.formatIdx].label} <span class="kbd">V</span>`;
+      document.getElementById("dirBtn").innerHTML = `${DIR_MODES[state.settings.dirIdx].label} <span class="kbd">M</span>`;
+      const blurBtn = document.getElementById("blurBtn");
+      blurBtn.innerHTML = `Blur: ${state.settings.blurOptions ? "On" : "Off"} <span class="kbd">B</span>`;
+      blurBtn.classList.toggle("active-toggle", state.settings.blurOptions);
+      document.getElementById("speedBtn").innerHTML = `Speed: ${SPEED_MODES[state.settings.speedIdx].label} <span class="kbd">F</span>`;
+
+      const focusBtn = document.getElementById("focusBtn");
+      focusBtn.textContent = focusWeakOnly ? "Weak & Unseen Only" : "All Terms";
+      focusBtn.classList.toggle("active-toggle", focusWeakOnly);
+    }
+
+    // Report View
+    function isReportOpen() {
+      return !document.getElementById("reportView").classList.contains("hidden");
+    }
+
+    function toggleReport(force) {
+      const show = typeof force === "boolean" ? force : !isReportOpen();
+      document.getElementById("quizView").classList.toggle("hidden", show);
+      document.getElementById("reportView").classList.toggle("hidden", !show);
+
+      if (show) {
+        clearTimeout(autoAdvanceTimeout);
+        clearTimeout(blurTimeout);
+        clearInterval(timerInterval);
+        if (stopwatchRunning) {
+          activeElapsedMs += performance.now() - segmentStartMs;
+          stopwatchRunning = false;
+        }
+        renderReport();
+      } else {
+        if (!answered && currentQ && !(currentQ.kind === "recall" && recallRevealed)) {
+          segmentStartMs = performance.now();
+          stopwatchRunning = true;
+          timerInterval = setInterval(renderTimer, 100);
+          if (currentQ.kind === "type") setTimeout(() => document.getElementById("typeInput").focus(), 20);
+        } else {
+          nextQuestion();
+        }
+      }
+    }
+
+    function renderReport() {
+      let totalAttempts = 0, totalCorrect = 0, totalWrong = 0, totalTime = 0, tried = 0, mastered = 0;
+      TERMS.forEach(t => {
+        const s = state.stats[t.id];
+        totalAttempts += s.attempts;
+        totalCorrect += s.correct;
+        totalWrong += s.wrong;
+        totalTime += s.totalTimeMs;
+        if (s.attempts > 0) tried++;
+        if (getStatus(t.id).label === "Mastered") mastered++;
+      });
+
+      const acc = totalAttempts > 0 ? ((totalCorrect / totalAttempts) * 100).toFixed(1) + "%" : "—";
+      const mcMed = (getBaselineMedian("mc_def") / 1000).toFixed(2) + "s";
+
+      document.getElementById("reportSummary").innerHTML = `
+        <div class="hud-card"><div class="hud-label">Total Tried</div><div class="hud-value">${totalAttempts}</div></div>
+        <div class="hud-card"><div class="hud-label">Total Wrong</div><div class="hud-value" style="color:#fca5a5">${totalWrong}</div></div>
+        <div class="hud-card"><div class="hud-label">Overall Accuracy</div><div class="hud-value">${acc}</div></div>
+        <div class="hud-card"><div class="hud-label">1.0x Pace (MC)</div><div class="hud-value">${mcMed}</div></div>
+        <div class="hud-card"><div class="hud-label">Terms Seen</div><div class="hud-value">${tried} / ${TERMS.length}</div></div>
+        <div class="hud-card"><div class="hud-label">Mastered</div><div class="hud-value" style="color:#86efac">${mastered} / ${TERMS.length}</div></div>
+      `;
+
+      // Confused Pairs summary
+      const pairs = [];
+      for (const [targetId, map] of Object.entries(state.confusedWith)) {
+        for (const [wrongId, count] of Object.entries(map)) {
+          if (count > 0 && TERM_MAP[targetId] && TERM_MAP[wrongId]) {
+            pairs.push({ target: TERM_MAP[targetId].term, wrong: TERM_MAP[wrongId].term, count });
+          }
+        }
+      }
+      pairs.sort((a, b) => b.count - a.count);
+      const confPanel = document.getElementById("confusedPanel");
+      if (pairs.length > 0) {
+        confPanel.classList.remove("hidden");
+        document.getElementById("confusedChips").innerHTML = pairs.slice(0, 8).map(p =>
+          `<span class="confused-chip"><strong>${p.target}</strong> mistaken for <strong>${p.wrong}</strong> (${p.count}x)</span>`
+        ).join("");
+      } else {
+        confPanel.classList.add("hidden");
+      }
+
+      // Filter counts
+      const counts = {
+        all: TERMS.length,
+        missed: TERMS.filter(t => state.stats[t.id].wrong > 0 || state.stats[t.id].missDebt > 0.3).length,
+        slow: TERMS.filter(t => {
+          const r = getAvgRelPace(state.stats[t.id]);
+          return r !== null && r > 1.3;
+        }).length,
+        unseen: TERMS.filter(t => state.stats[t.id].attempts === 0).length,
+        mastered
+      };
+
+      document.querySelectorAll("#filterGroup button").forEach(btn => {
+        const f = btn.dataset.filter;
+        const labels = { all: "All", missed: "Missed / Debt", slow: "Rel Slow (>1.3x)", unseen: "Unseen", mastered: "Mastered" };
+        btn.textContent = `${labels[f]} (${counts[f]})`;
+        btn.classList.toggle("active-toggle", reportFilter === f);
+      });
+
+      let rows = TERMS.map(t => {
+        const s = state.stats[t.id];
+        const accVal = s.attempts > 0 ? (s.correct / s.attempts) * 100 : null;
+        const avgTime = s.attempts > 0 ? s.totalTimeMs / s.attempts / 1000 : null;
+        const relPace = getAvgRelPace(s);
+        const weight = computeWeight(t.id);
+        const status = getStatus(t.id);
+        return { t, s, accVal, avgTime, relPace, weight, status };
+      });
+
+      if (reportFilter === "missed") rows = rows.filter(r => r.s.wrong > 0 || r.s.missDebt > 0.3);
+      else if (reportFilter === "slow") rows = rows.filter(r => r.relPace !== null && r.relPace > 1.3);
+      else if (reportFilter === "unseen") rows = rows.filter(r => r.s.attempts === 0);
+      else if (reportFilter === "mastered") rows = rows.filter(r => r.status.label === "Mastered");
+
+      rows.sort((a, b) => {
+        const dir = sortDir === "asc" ? 1 : -1;
+        switch (sortCol) {
+          case "term": return a.t.term.localeCompare(b.t.term) * dir;
+          case "attempts": return (a.s.attempts - b.s.attempts) * dir;
+          case "wrong": return (a.s.wrong - b.s.wrong) * dir;
+          case "correct": return (a.s.correct - b.s.correct) * dir;
+          case "accuracy": return ((a.accVal ?? -1) - (b.accVal ?? -1)) * dir;
+          case "avgTime": return ((a.avgTime ?? -1) - (b.avgTime ?? -1)) * dir;
+          case "relSpeed": return ((a.relPace ?? -1) - (b.relPace ?? -1)) * dir;
+          case "status": return a.status.label.localeCompare(b.status.label) * dir;
+          default: return (a.weight - b.weight) * dir;
+        }
+      });
+
+      const tbody = document.getElementById("reportTableBody");
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px;">No terms match this filter yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        const relBadge = r.relPace === null ? "—" :
+          r.relPace > 1.3 ? `<span style="color:#fcd34d;font-weight:700">${r.relPace.toFixed(2)}x Slow</span>` :
+          r.relPace < 0.85 ? `<span style="color:#86efac">${r.relPace.toFixed(2)}x Fast</span>` :
+          `${r.relPace.toFixed(2)}x`;
+
+        const isExp = expandedRowId === r.t.id;
+        const mainRow = `
+          <tr class="term-row" data-id="${r.t.id}">
+            <td class="term-col">
+              ${isExp ? "▾" : "▸"} ${r.t.term}
+              <span class="def-preview">${r.t.short}</span>
+            </td>
+            <td class="num">${r.s.attempts}</td>
+            <td class="num" style="color:${r.s.wrong > 0 ? '#fca5a5' : 'var(--muted)'}; font-weight:${r.s.wrong > 0 ? '700' : '400'}">${r.s.wrong}</td>
+            <td class="num">${r.s.correct}</td>
+            <td class="num">${r.accVal !== null ? r.accVal.toFixed(0) + "%" : "—"}</td>
+            <td class="num">${r.avgTime !== null ? r.avgTime.toFixed(2) + "s" : "—"}</td>
+            <td class="num">${relBadge}</td>
+            <td class="num">${r.weight}</td>
+            <td><span class="pill ${r.status.cls}">${r.status.label}</span></td>
+          </tr>
+        `;
+
+        if (!isExp) return mainRow;
+        const confList = Object.entries(state.confusedWith[r.t.id] || {})
+          .filter(([, c]) => c > 0 && TERM_MAP[arguments]) // handled cleanly below
+        const confEntries = Object.entries(state.confusedWith[r.t.id] || {})
+          .filter(([id, c]) => c > 0 && TERM_MAP[id])
+          .map(([id, c]) => `${TERM_MAP[id].term} (${c}x)`);
+
+        return mainRow + `
+          <tr class="detail-row">
+            <td colspan="9">
+              <div><strong>Memory Hook:</strong> ${r.t.hook}</div>
+              ${confEntries.length ? `<div style="margin-top:4px;color:#fca5a5"><strong>Confused with:</strong> ${confEntries.join(", ")}</div>` : ""}
+              <div style="margin-top:6px;"><strong>4 Test Angles:</strong></div>
+              <ol class="angle-list">
+                ${r.t.prompts.map(p => `<li>${p}</li>`).join("")}
+              </ol>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll("tr.term-row").forEach(tr => {
+        tr.addEventListener("click", () => {
+          const id = tr.dataset.id;
+          expandedRowId = expandedRowId === id ? null : id;
+          renderReport();
+        });
+      });
+    }
+
+    function exportCSV() {
+      const headers = ["Term", "Attempts", "Wrong", "Correct", "Accuracy %", "Avg Time (s)", "Rel Pace (x)", "Miss Debt", "Priority", "Stage"];
+      const lines = [headers.join(",")];
+      TERMS.forEach(t => {
+        const s = state.stats[t.id];
+        const acc = s.attempts > 0 ? ((s.correct / s.attempts) * 100).toFixed(1) : "";
+        const avg = s.attempts > 0 ? (s.totalTimeMs / s.attempts / 1000).toFixed(2) : "";
+        const rel = getAvgRelPace(s) !== null ? getAvgRelPace(s).toFixed(2) : "";
+        lines.push([
+          `"${t.term.replace(/"/g, '""')}"`,
+          s.attempts, s.wrong, s.correct, acc, avg, rel,
+          s.missDebt, computeWeight(t.id), getStatus(t.id).label
+        ].join(","));
+      });
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "apwh-mastery-report.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Event Bindings
+    document.getElementById("formatBtn").addEventListener("click", () => {
+      state.settings.formatIdx = (state.settings.formatIdx + 1) % FORMAT_MODES.length;
+      saveState();
+      updateHUD();
+      if (!isReportOpen()) nextQuestion();
+    });
+
+    document.getElementById("dirBtn").addEventListener("click", () => {
+      state.settings.dirIdx = (state.settings.dirIdx + 1) % DIR_MODES.length;
+      saveState();
+      updateHUD();
+      if (!isReportOpen()) nextQuestion();
+    });
+
+    document.getElementById("blurBtn").addEventListener("click", () => {
+      state.settings.blurOptions = !state.settings.blurOptions;
+      saveState();
+      updateHUD();
+      if (!state.settings.blurOptions && blurActive) setBlurState(false);
+    });
+
+    document.getElementById("speedBtn").addEventListener("click", () => {
+      state.settings.speedIdx = (state.settings.speedIdx + 1) % SPEED_MODES.length;
+      saveState();
+      updateHUD();
+    });
+
+    document.getElementById("focusBtn").addEventListener("click", () => {
+      focusWeakOnly = !focusWeakOnly;
+      updateHUD();
+      if (!isReportOpen()) nextQuestion();
+    });
+
+    document.getElementById("blurOverlay").addEventListener("click", () => {
+      clearTimeout(blurTimeout);
+      setBlurState(false);
+    });
+
+    document.getElementById("revealRecallBtn").addEventListener("click", revealRecall);
+    document.querySelectorAll(".recall-actions button").forEach(btn => {
+      btn.addEventListener("click", () => gradeRecall(btn.dataset.grade));
+    });
+
+    document.getElementById("typeSubmitBtn").addEventListener("click", submitTypeAnswer);
+    document.getElementById("typeHintBtn").addEventListener("click", showTypeHint);
+    document.getElementById("typeInput").addEventListener("keydown", (e) => {
+      if (e.key === "?") {
+        e.preventDefault();
+        showTypeHint();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (!answered) submitTypeAnswer();
+        else nextQuestion();
+      }
+    });
+
+    document.getElementById("reportBtn").addEventListener("click", () => toggleReport());
+    document.getElementById("backToQuizBtn").addEventListener("click", () => toggleReport(false));
+    document.getElementById("nextBtn").addEventListener("click", nextQuestion);
+    document.getElementById("exportCsvBtn").addEventListener("click", exportCSV);
+
+    document.getElementById("practiceWeakBtn").addEventListener("click", () => {
+      focusWeakOnly = true;
+      toggleReport(false);
+      nextQuestion();
+    });
+
+    document.getElementById("resetStatsBtn").addEventListener("click", () => {
+      if (confirm("Reset all mastery progress, confusion history, and speed baselines?")) {
+        TERMS.forEach(t => { state.stats[t.id] = defaultStat(); });
+        state.confusedWith = {};
+        state.baselines = { mc_def: [], mc_term: [], recall: [], type: [] };
+        state.requeue = [];
+        round = 0;
+        session = { attempts: 0, correct: 0, streak: 0 };
+        saveState();
+        updateHUD();
+        renderReport();
+      }
+    });
+
+    document.querySelectorAll("#filterGroup button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        reportFilter = btn.dataset.filter;
+        renderReport();
+      });
+    });
+
+    document.querySelectorAll("th[data-sort]").forEach(th => {
+      th.addEventListener("click", () => {
+        const col = th.dataset.sort;
+        if (sortCol === col) sortDir = sortDir === "desc" ? "asc" : "desc";
+        else {
+          sortCol = col;
+          sortDir = col === "term" || col === "status" ? "asc" : "desc";
+        }
+        renderReport();
+      });
+    });
+
+    // Global Keyboard Controls (safely ignores typing inside text input)
+    document.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const activeTag = document.activeElement?.tagName;
+      if (activeTag === "INPUT" || activeTag === "TEXTAREA") {
+        if (e.key === "Escape") document.activeElement.blur();
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === "r") { e.preventDefault(); toggleReport(); return; }
+      if (key === "v") { e.preventDefault(); document.getElementById("formatBtn").click(); return; }
+      if (key === "m") { e.preventDefault(); document.getElementById("dirBtn").click(); return; }
+      if (key === "b") { e.preventDefault(); document.getElementById("blurBtn").click(); return; }
+      if (key === "f") { e.preventDefault(); document.getElementById("speedBtn").click(); return; }
+
+      if (isReportOpen()) {
+        if (key === "escape") toggleReport(false);
+        return;
+      }
+
+      if (!currentQ) return;
+
+      // Space / Enter handling
+      if (key === " " || key === "enter") {
+        e.preventDefault();
+        if (currentQ.kind === "mc" && blurActive) {
+          clearTimeout(blurTimeout);
+          setBlurState(false);
+          return;
+        }
+        if (currentQ.kind === "recall" && !recallRevealed) {
+          revealRecall();
+          return;
+        }
+        if (answered) {
+          nextQuestion();
+        }
+        return;
+      }
+
+      // 1-4 or A-D selection
+      const map = { "1": 0, "2": 1, "3": 2, "4": 3, "a": 0, "b": 1, "c": 2, "d": 3 };
+      if (key in map) {
+        e.preventDefault();
+        const idx = map[key];
+        if (answered) {
+          nextQuestion();
+          return;
+        }
+        if (currentQ.kind === "mc") {
+          selectMC(idx);
+        } else if (currentQ.kind === "recall" && recallRevealed && idx <= 2) {
+          const grades = ["good", "hard", "bad"];
+          gradeRecall(grades[idx]);
+        }
+      }
+    });
+
+    updateHUD();
+    nextQuestion();
+  </script>
+</body>
+</html>
